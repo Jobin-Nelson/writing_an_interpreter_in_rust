@@ -2,9 +2,6 @@ mod lexer;
 mod token;
 
 fn main() {
-    let ch = ' ' as u8;
+    let ch = b' ';
     println!("{}", ch);
 }
-
-#[cfg(test)]
-mod lexer_test;

@@ -1,18 +1,22 @@
 #[derive(PartialEq, Debug)]
 pub enum Token {
-    IDENT(String),
-    INT(String),
-    ILLEGAL,
-    EOF,
-    ASSIGN,
-    PLUS,
-    MINUS,
-    COMMA,
-    SEMICOLON,
-    LPAREN,
-    RPAREN,
-    LBRACE,
-    RBRACE,
-    FUNCTION,
-    LET,
+    Ident(String),
+    Int(String),
+    Eof,
+    Assign,
+    Plus,
+    Minus,
+    Comma,
+    Semicolon,
+    Lparen,
+    Rparen,
+    Lbrace,
+    Rbrace,
+    Function,
+    Let,
+}
+
+#[derive(PartialEq, Debug)]
+pub enum TokenError {
+    Illegal,
 }
