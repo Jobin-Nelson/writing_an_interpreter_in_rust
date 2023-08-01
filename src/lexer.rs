@@ -81,6 +81,27 @@ impl Lexer {
     }
 }
 
+impl IntoIterator for Lexer {
+    type Item = Token;
+    type IntoIter = TokenIterator;
+
+    fn into_iter(self) -> Self::IntoIter {
+        TokenIterator { lexer: self }
+    }
+}
+
+pub struct TokenIterator {
+    lexer: Lexer,
+}
+
+impl Iterator for TokenIterator {
+    type Item = Token;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.lexer.next_token().ok()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -136,15 +157,8 @@ let result = add(five, ten);
             Token::Eof,
         ];
 
-        let mut l = Lexer::new(input.to_string());
+        let l = Lexer::new(input.to_string());
 
-        for (idx, expected_token) in expected_tokens.iter().enumerate() {
-            let tok = l.next_token().unwrap();
-            println!(
-                "Index: {}, Received {:?}, expected {:?}",
-                idx, tok, expected_token
-            );
-            assert_eq!(&tok, expected_token);
-        }
+        l.into_iter().eq(expected_tokens.into_iter());
     }
 }
