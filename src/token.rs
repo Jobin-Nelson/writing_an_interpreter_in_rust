@@ -5,6 +5,8 @@ pub enum Token {
     Bang,
     Lt,
     Gt,
+    Eq,
+    Neq,
     Assign,
     Comma,
     Semicolon,
@@ -28,7 +30,12 @@ pub enum Operation {
 #[derive(PartialEq, Debug)]
 pub enum Keyword {
     Function,
+    Return,
     Let,
+    If,
+    Else,
+    True,
+    False,
 }
 
 #[derive(PartialEq, Debug)]

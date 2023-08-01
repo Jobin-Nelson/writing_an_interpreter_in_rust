@@ -29,13 +29,15 @@ impl Lexer {
         self.read_position += 1;
     }
 
+    pub fn peek_char(&self) -> Option<&u8> {
+        self.input.get(self.read_position)
+    }
+
     pub fn next_token(&mut self) -> Result<Token, TokenError> {
         self.skip_whitespace();
 
         let tok = match self.ch {
             b'\0' => Token::Eof,
-            b'=' => Token::Assign,
-            b'!' => Token::Bang,
             b'>' => Token::Gt,
             b'<' => Token::Lt,
             b',' => Token::Comma,
@@ -44,6 +46,22 @@ impl Lexer {
             b')' => Token::Rparen,
             b'{' => Token::Lbrace,
             b'}' => Token::Rbrace,
+            b'=' => {
+                if let Some(&b'=') = self.peek_char() {
+                    self.read_char();
+                    Token::Eq
+                } else {
+                    Token::Assign
+                }
+            }
+            b'!' => {
+                if let Some(&b'=') = self.peek_char() {
+                    self.read_char();
+                    Token::Neq
+                } else {
+                    Token::Bang
+                }
+            }
             b'+' => Token::Op(Operation::Plus),
             b'-' => Token::Op(Operation::Minus),
             b'*' => Token::Op(Operation::Asterisk),
@@ -53,6 +71,11 @@ impl Lexer {
                 return Ok(match ident.as_str() {
                     "let" => Token::Kw(Keyword::Let),
                     "fn" => Token::Kw(Keyword::Function),
+                    "return" => Token::Kw(Keyword::Return),
+                    "if" => Token::Kw(Keyword::If),
+                    "else" => Token::Kw(Keyword::Else),
+                    "true" => Token::Kw(Keyword::True),
+                    "false" => Token::Kw(Keyword::False),
                     _ => Token::Ident(ident),
                 });
             }
@@ -133,6 +156,15 @@ let add = fn(x, y) {
 let result = add(five, ten);
 !-/*5;
 5 < 10 > 5;
+
+if (5 < 10) {
+    return true;
+} else {
+    return false;
+}
+
+10 == 10;
+10 != 9;
 "#;
 
         let expected_tokens: Vec<Token> = vec![
@@ -184,15 +216,43 @@ let result = add(five, ten);
             Token::Gt,
             Token::Int("5".to_string()),
             Token::Semicolon,
+            Token::Kw(Keyword::If),
+            Token::Lparen,
+            Token::Int("5".to_string()),
+            Token::Lt,
+            Token::Int("10".to_string()),
+            Token::Rparen,
+            Token::Lbrace,
+            Token::Kw(Keyword::Return),
+            Token::Kw(Keyword::True),
+            Token::Semicolon,
+            Token::Rbrace,
+            Token::Kw(Keyword::Else),
+            Token::Lbrace,
+            Token::Kw(Keyword::Return),
+            Token::Kw(Keyword::False),
+            Token::Semicolon,
+            Token::Rbrace,
+            Token::Int("10".to_string()),
+            Token::Eq,
+            Token::Int("10".to_string()),
+            Token::Semicolon,
+            Token::Int("10".to_string()),
+            Token::Neq,
+            Token::Int("9".to_string()),
+            Token::Semicolon,
             Token::Eof,
         ];
 
-        let l = Lexer::new(input.to_string());
+        let mut l = Lexer::new(input.to_string());
 
-        assert!(l.into_iter().eq(expected_tokens.into_iter()));
+        // assert!(l.into_iter().eq(expected_tokens.into_iter()));
         // l.into_iter().enumerate().for_each(|(i, tok)| {
         //     println!("recieved {:?}, expected: {:?}", tok, expected_tokens.get(i));
         //     assert_eq!(&tok, expected_tokens.get(i).unwrap());
         // });
+        for exp_tok in expected_tokens {
+            assert_eq!(l.next_token().unwrap(), exp_tok);
+        }
     }
 }
