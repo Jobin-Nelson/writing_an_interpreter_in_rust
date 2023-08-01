@@ -2,16 +2,29 @@
 pub enum Token {
     Ident(String),
     Int(String),
-    Eof,
     Assign,
-    Plus,
-    Minus,
     Comma,
     Semicolon,
     Lparen,
     Rparen,
     Lbrace,
     Rbrace,
+    Op(Operation),
+    Kw(Keyword),
+    Eof,
+}
+
+#[derive(PartialEq, Debug)]
+pub enum Operation {
+    Plus,
+    Minus,
+    Bang,
+    Asterisk,
+    Slash,
+}
+
+#[derive(PartialEq, Debug)]
+pub enum Keyword {
     Function,
     Let,
 }

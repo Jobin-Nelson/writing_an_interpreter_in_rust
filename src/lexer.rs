@@ -1,4 +1,4 @@
-use crate::token::{Token, TokenError};
+use crate::token::{Keyword, Operation, Token, TokenError};
 
 pub struct Lexer {
     input: Vec<u8>,
@@ -35,8 +35,8 @@ impl Lexer {
         let tok = match self.ch {
             b'\0' => Token::Eof,
             b'=' => Token::Assign,
-            b'+' => Token::Plus,
-            b'-' => Token::Minus,
+            b'+' => Token::Op(Operation::Plus),
+            b'-' => Token::Op(Operation::Minus),
             b',' => Token::Comma,
             b';' => Token::Semicolon,
             b'(' => Token::Lparen,
@@ -46,8 +46,8 @@ impl Lexer {
             b'a'..=b'z' | b'A'..=b'Z' | b'_' => {
                 let ident = self.read_identifier();
                 return Ok(match ident.as_str() {
-                    "let" => Token::Let,
-                    "fn" => Token::Function,
+                    "let" => Token::Kw(Keyword::Let),
+                    "fn" => Token::Kw(Keyword::Function),
                     _ => Token::Ident(ident),
                 });
             }
@@ -115,23 +115,25 @@ let add = fn(x, y) {
 };
 
 let result = add(five, ten);
+!-/*5;
+5 < 10 > 5;
 "#;
 
         let expected_tokens: Vec<Token> = vec![
-            Token::Let,
+            Token::Kw(Keyword::Let),
             Token::Ident("five".to_string()),
             Token::Assign,
             Token::Int("5".to_string()),
             Token::Semicolon,
-            Token::Let,
+            Token::Kw(Keyword::Let),
             Token::Ident("ten".to_string()),
             Token::Assign,
             Token::Int("10".to_string()),
             Token::Semicolon,
-            Token::Let,
+            Token::Kw(Keyword::Let),
             Token::Ident("add".to_string()),
             Token::Assign,
-            Token::Function,
+            Token::Kw(Keyword::Function),
             Token::Lparen,
             Token::Ident("x".to_string()),
             Token::Comma,
@@ -139,12 +141,12 @@ let result = add(five, ten);
             Token::Rparen,
             Token::Lbrace,
             Token::Ident("x".to_string()),
-            Token::Plus,
+            Token::Op(Operation::Plus),
             Token::Ident("y".to_string()),
             Token::Semicolon,
             Token::Rbrace,
             Token::Semicolon,
-            Token::Let,
+            Token::Kw(Keyword::Let),
             Token::Ident("result".to_string()),
             Token::Assign,
             Token::Ident("add".to_string()),
