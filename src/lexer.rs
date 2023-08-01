@@ -46,22 +46,8 @@ impl Lexer {
             b')' => Token::Rparen,
             b'{' => Token::Lbrace,
             b'}' => Token::Rbrace,
-            b'=' => {
-                if let Some(&b'=') = self.peek_char() {
-                    self.read_char();
-                    Token::Eq
-                } else {
-                    Token::Assign
-                }
-            }
-            b'!' => {
-                if let Some(&b'=') = self.peek_char() {
-                    self.read_char();
-                    Token::Neq
-                } else {
-                    Token::Bang
-                }
-            }
+            b'=' => self.make_two_char_token(Token::Eq, Token::Assign),
+            b'!' => self.make_two_char_token(Token::Neq, Token::Bang),
             b'+' => Token::Op(Operation::Plus),
             b'-' => Token::Op(Operation::Minus),
             b'*' => Token::Op(Operation::Asterisk),
@@ -89,6 +75,15 @@ impl Lexer {
     pub fn skip_whitespace(&mut self) {
         while self.ch.is_ascii_whitespace() {
             self.read_char();
+        }
+    }
+
+    pub fn make_two_char_token(&mut self, true_tok: Token, false_tok: Token) -> Token {
+        if let Some(&b'=') = self.peek_char() {
+            self.read_char();
+            true_tok
+        } else {
+            false_tok
         }
     }
 
