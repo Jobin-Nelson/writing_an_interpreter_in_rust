@@ -2,6 +2,9 @@
 pub enum Token {
     Ident(String),
     Int(String),
+    Bang,
+    Lt,
+    Gt,
     Assign,
     Comma,
     Semicolon,
@@ -18,7 +21,6 @@ pub enum Token {
 pub enum Operation {
     Plus,
     Minus,
-    Bang,
     Asterisk,
     Slash,
 }

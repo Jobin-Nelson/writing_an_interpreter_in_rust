@@ -35,14 +35,19 @@ impl Lexer {
         let tok = match self.ch {
             b'\0' => Token::Eof,
             b'=' => Token::Assign,
-            b'+' => Token::Op(Operation::Plus),
-            b'-' => Token::Op(Operation::Minus),
+            b'!' => Token::Bang,
+            b'>' => Token::Gt,
+            b'<' => Token::Lt,
             b',' => Token::Comma,
             b';' => Token::Semicolon,
             b'(' => Token::Lparen,
             b')' => Token::Rparen,
             b'{' => Token::Lbrace,
             b'}' => Token::Rbrace,
+            b'+' => Token::Op(Operation::Plus),
+            b'-' => Token::Op(Operation::Minus),
+            b'*' => Token::Op(Operation::Asterisk),
+            b'/' => Token::Op(Operation::Slash),
             b'a'..=b'z' | b'A'..=b'Z' | b'_' => {
                 let ident = self.read_identifier();
                 return Ok(match ident.as_str() {
@@ -86,19 +91,30 @@ impl IntoIterator for Lexer {
     type IntoIter = TokenIterator;
 
     fn into_iter(self) -> Self::IntoIter {
-        TokenIterator { lexer: self }
+        TokenIterator {
+            lexer: self,
+            is_eof: false,
+        }
     }
 }
 
 pub struct TokenIterator {
     lexer: Lexer,
+    is_eof: bool,
 }
 
 impl Iterator for TokenIterator {
     type Item = Token;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.lexer.next_token().ok()
+        if self.is_eof {
+            return None;
+        }
+        let next_token = self.lexer.next_token().ok();
+        if let Some(Token::Eof) = next_token {
+            self.is_eof = true;
+        }
+        next_token
     }
 }
 
@@ -156,11 +172,27 @@ let result = add(five, ten);
             Token::Ident("ten".to_string()),
             Token::Rparen,
             Token::Semicolon,
+            Token::Bang,
+            Token::Op(Operation::Minus),
+            Token::Op(Operation::Slash),
+            Token::Op(Operation::Asterisk),
+            Token::Int("5".to_string()),
+            Token::Semicolon,
+            Token::Int("5".to_string()),
+            Token::Lt,
+            Token::Int("10".to_string()),
+            Token::Gt,
+            Token::Int("5".to_string()),
+            Token::Semicolon,
             Token::Eof,
         ];
 
         let l = Lexer::new(input.to_string());
 
-        l.into_iter().eq(expected_tokens.into_iter());
+        assert!(l.into_iter().eq(expected_tokens.into_iter()));
+        // l.into_iter().enumerate().for_each(|(i, tok)| {
+        //     println!("recieved {:?}, expected: {:?}", tok, expected_tokens.get(i));
+        //     assert_eq!(&tok, expected_tokens.get(i).unwrap());
+        // });
     }
 }
