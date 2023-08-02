@@ -78,12 +78,12 @@ impl Lexer {
         }
     }
 
-    pub fn make_two_char_token(&mut self, true_tok: Token, false_tok: Token) -> Token {
+    pub fn make_two_char_token(&mut self, two_char_tok: Token, one_char_tok: Token) -> Token {
         if let Some(&b'=') = self.peek_char() {
             self.read_char();
-            true_tok
+            two_char_tok
         } else {
-            false_tok
+            one_char_tok
         }
     }
 
