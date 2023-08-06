@@ -1,4 +1,4 @@
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum Token {
     Ident(String),
     Int(String),
@@ -19,7 +19,7 @@ pub enum Token {
     Eof,
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum Operation {
     Plus,
     Minus,
@@ -27,7 +27,7 @@ pub enum Operation {
     Slash,
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum Keyword {
     Function,
     Return,
@@ -38,7 +38,7 @@ pub enum Keyword {
     False,
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum TokenError {
     Illegal,
 }
