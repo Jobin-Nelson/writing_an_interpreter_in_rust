@@ -42,7 +42,7 @@ pub struct Statement;
 pub struct Expression;
 
 // Root node
-pub struct Program<T> {
+pub struct Program<T: Node> {
     statements: Vec<T>,
 }
 

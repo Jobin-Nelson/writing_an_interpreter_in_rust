@@ -1,4 +1,3 @@
-use crate::ast;
 use crate::lexer::Lexer;
 use crate::token::Token;
 
