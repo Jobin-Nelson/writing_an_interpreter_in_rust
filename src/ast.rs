@@ -38,15 +38,19 @@ pub trait Node {
     }
 }
 
-pub struct Statement;
-pub struct Expression;
-
-// Root node
-pub struct Program<T: Node> {
-    statements: Vec<T>,
+pub trait Statement: Node {
+    fn statement_node() {}
+}
+pub trait Expression: Node {
+    fn expression_node() {}
 }
 
-impl<T: Node> Node for Program<T> {
+// Root node
+pub struct Program {
+    statements: Vec<Box<dyn Node>>,
+}
+
+impl Node for Program {
     fn get_token(&self) -> &Token {
         self.statements[0].get_token()
     }
@@ -59,13 +63,17 @@ impl<T: Node> Node for Program<T> {
 }
 
 // Statement nodes
-pub struct LetStatement {
+pub struct LetStatement<T: Expression> {
     token: Token,
     name: Identifier,
-    value: Expression,
+    value: T,
 }
 
-impl Node for LetStatement {
+impl<T: Expression> Statement for LetStatement<T> {
+    fn statement_node() {}
+}
+
+impl<T: Expression> Node for LetStatement<T> {
     fn get_token(&self) -> &Token {
         &self.token
     }
@@ -74,6 +82,10 @@ impl Node for LetStatement {
 pub struct Identifier {
     token: Token,
     value: String,
+}
+
+impl Expression for Identifier {
+    fn expression_node() {}
 }
 
 impl Node for Identifier {

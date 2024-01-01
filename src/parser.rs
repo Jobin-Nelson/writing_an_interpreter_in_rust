@@ -1,3 +1,4 @@
+use crate::ast::{Node, Program};
 use crate::lexer::Lexer;
 use crate::token::Token;
 
@@ -22,5 +23,9 @@ impl Parser {
     pub fn next_token(&mut self) {
         self.cur_token = self.peek_token.clone().unwrap();
         self.peek_token = self.l.next_token().ok();
+    }
+
+    pub fn parse_program(&mut self) -> Program {
+        todo!();
     }
 }

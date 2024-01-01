@@ -21,7 +21,7 @@ impl Lexer {
 
     pub fn read_char(&mut self) {
         if self.read_position >= self.input.len() {
-            self.ch = b'\0';
+            self.ch = b'\0'; // null byte has value 0
         } else {
             self.ch = self.input[self.read_position];
         }
@@ -52,6 +52,7 @@ impl Lexer {
             b'-' => Token::Op(Operation::Minus),
             b'*' => Token::Op(Operation::Asterisk),
             b'/' => Token::Op(Operation::Slash),
+            // c if c.is_ascii_alphabetic() || c == b'_' => {
             b'a'..=b'z' | b'A'..=b'Z' | b'_' => {
                 let ident = self.read_identifier();
                 return Ok(match ident.as_str() {
