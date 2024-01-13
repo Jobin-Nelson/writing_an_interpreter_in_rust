@@ -1,41 +1,7 @@
-use crate::token::{Keyword, Operation, Token};
+use crate::token::Token;
 
 pub trait Node {
-    fn get_token(&self) -> &Token;
-    fn token_literal(&self) -> &str {
-        match self.get_token() {
-            Token::Ident(s) => s.as_str(),
-            Token::Int(i) => i.as_str(),
-            Token::Bang => "!",
-            Token::Lt => "<",
-            Token::Gt => ">",
-            Token::Eq => "==",
-            Token::Neq => "!=",
-            Token::Assign => "=",
-            Token::Comma => ",",
-            Token::Semicolon => ";",
-            Token::Lparen => "(",
-            Token::Rparen => ")",
-            Token::Lbrace => "{",
-            Token::Rbrace => "}",
-            Token::Op(o) => match o {
-                Operation::Plus => "+",
-                Operation::Minus => "-",
-                Operation::Asterisk => "*",
-                Operation::Slash => "/",
-            },
-            Token::Kw(k) => match k {
-                Keyword::Function => "function",
-                Keyword::Return => "return",
-                Keyword::Let => "let",
-                Keyword::If => "if",
-                Keyword::Else => "else",
-                Keyword::True => "true",
-                Keyword::False => "false",
-            },
-            Token::Eof => "EOF",
-        }
-    }
+    fn token_literal(&self) -> &str;
 }
 
 pub trait Statement: Node {
@@ -51,9 +17,6 @@ pub struct Program {
 }
 
 impl Node for Program {
-    fn get_token(&self) -> &Token {
-        self.statements[0].get_token()
-    }
     fn token_literal(&self) -> &str {
         if self.statements.is_empty() {
             return "";
@@ -69,13 +32,10 @@ pub struct LetStatement<T: Expression> {
     value: T,
 }
 
-impl<T: Expression> Statement for LetStatement<T> {
-    fn statement_node() {}
-}
-
+impl<T: Expression> Statement for LetStatement<T> {}
 impl<T: Expression> Node for LetStatement<T> {
-    fn get_token(&self) -> &Token {
-        &self.token
+    fn token_literal(&self) -> &str {
+        self.token.literal()
     }
 }
 
@@ -84,12 +44,9 @@ pub struct Identifier {
     value: String,
 }
 
-impl Expression for Identifier {
-    fn expression_node() {}
-}
-
+impl Expression for Identifier {}
 impl Node for Identifier {
-    fn get_token(&self) -> &Token {
-        &self.token
+    fn token_literal(&self) -> &str {
+        self.token.literal()
     }
 }
