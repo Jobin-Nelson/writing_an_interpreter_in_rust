@@ -67,7 +67,7 @@ impl Lexer {
                 });
             }
             b'0'..=b'9' => return Ok(Token::Int(self.read_numbers())),
-            _ => return Err(TokenError::Illegal),
+            _ => return Err(TokenError::Illegal(self.ch)),
         };
         self.read_char();
         Ok(tok)

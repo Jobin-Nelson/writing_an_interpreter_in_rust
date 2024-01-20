@@ -1,28 +1,41 @@
-use crate::ast::{Node, Program};
+use std::rc::Rc;
+
+use crate::ast::Program;
 use crate::lexer::Lexer;
-use crate::token::Token;
+use crate::token::{Token, TokenError};
+
+pub struct ParseTokenError(u8);
+
+impl From<TokenError> for ParseTokenError {
+    fn from(value: TokenError) -> Self {
+        match value {
+            TokenError::Illegal(n) => ParseTokenError(n),
+        }
+    }
+}
 
 pub struct Parser {
     l: Lexer,
-    cur_token: Token,
-    peek_token: Option<Token>,
+    cur_token: Rc<Token>,
+    peek_token: Rc<Token>,
 }
 
 impl Parser {
-    pub fn new(l: Lexer) -> Self {
+    pub fn new(l: Lexer) -> Result<Self, ParseTokenError> {
         let mut p = Self {
             l,
-            cur_token: Token::Eof,
-            peek_token: Some(Token::Eof),
+            cur_token: Rc::new(Token::Eof),
+            peek_token: Rc::new(Token::Eof),
         };
-        p.next_token();
-        p.next_token();
-        p
+        p.next_token()?;
+        p.next_token()?;
+        Ok(p)
     }
 
-    pub fn next_token(&mut self) {
-        self.cur_token = self.peek_token.clone().unwrap();
-        self.peek_token = self.l.next_token().ok();
+    pub fn next_token(&mut self) -> Result<(), ParseTokenError> {
+        self.cur_token = Rc::clone(&self.peek_token);
+        self.peek_token = Rc::new(self.l.next_token()?);
+        Ok(())
     }
 
     pub fn parse_program(&mut self) -> Program {

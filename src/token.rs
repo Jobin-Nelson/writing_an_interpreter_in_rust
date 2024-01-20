@@ -40,7 +40,7 @@ pub enum Keyword {
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum TokenError {
-    Illegal,
+    Illegal(u8),
 }
 
 impl Token {
